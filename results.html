@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results &amp; Analytics - CPU Scheduling &amp; DS Visualizer</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/simulation.css">
+    <style>
+        @media print {
+            .site-header, .site-footer, .no-print {
+                display: none !important;
+            }
+            .card {
+                border: 1px solid #000;
+                box-shadow: none;
+            }
+            body {
+                background: #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="site-header-placeholder"></div>
+
+    <main id="main-content" class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-top">
+                <div>
+                    <h1 class="page-title">Simulation Results &amp; Analytics</h1>
+                    <p class="page-subtitle">
+                        Detailed turnaround times, waiting times, response times, CPU utilization breakdown, and multi-algorithm comparative matrix for the active workload.
+                    </p>
+                </div>
+                <div class="no-print" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <label for="select-result-algo" style="font-size: 0.88rem; font-weight: 600;">Algorithm:</label>
+                    <select id="select-result-algo" class="select-mini">
+                        <option value="fcfs">FCFS</option>
+                        <option value="sjf">SJF (Non-Preemptive)</option>
+                        <option value="srtf">SRTF (Preemptive)</option>
+                        <option value="rr">Round Robin</option>
+                        <option value="priority-np">Priority (Non-Preemptive)</option>
+                        <option value="priority-p">Priority (Preemptive)</option>
+                    </select>
+                    <button type="button" id="btn-export-csv" class="btn btn-secondary btn-sm">📥 Export CSV</button>
+                    <button type="button" id="btn-print-report" class="btn btn-secondary btn-sm">🖨️ Print Report</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric Tiles Summary -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <span class="metric-name">Average Waiting Time</span>
+                <span id="res-avg-wt" class="metric-num">0.00</span>
+                <span class="metric-unit">Units</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-name">Average Turnaround Time</span>
+                <span id="res-avg-tat" class="metric-num">0.00</span>
+                <span class="metric-unit">Units</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-name">Average Response Time</span>
+                <span id="res-avg-rt" class="metric-num">0.00</span>
+                <span class="metric-unit">Units</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-name">CPU Utilization</span>
+                <span id="res-cpu-util" class="metric-num">100%</span>
+                <span class="metric-unit">Efficiency</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-name">Context Switches</span>
+                <span id="res-switches" class="metric-num">0</span>
+                <span class="metric-unit">Switches</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-name">Throughput</span>
+                <span id="res-throughput" class="metric-num">0.00</span>
+                <span class="metric-unit">Procs / unit time</span>
+            </div>
+        </div>
+
+        <!-- Starvation Alert Box -->
+        <div id="results-starvation-box" class="alert alert-warning" style="display: none;"></div>
+
+        <!-- Section 1: Detailed Process Results Table -->
+        <section class="card">
+            <div class="card-header">
+                <h2>1. Process Execution Metrics Table</h2>
+                <span class="badge-tag">Mathematical Verification</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table text-center">
+                        <thead>
+                            <tr>
+                                <th>PID</th>
+                                <th>Arrival Time (AT)</th>
+                                <th>Burst Time (BT)</th>
+                                <th>Priority</th>
+                                <th>Completion Time (CT)</th>
+                                <th>Turnaround Time (TAT)</th>
+                                <th>Waiting Time (WT)</th>
+                                <th>Response Time (RT)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <!-- Populated by js/results.js -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Formulas Reference Footer -->
+                <div style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted); background: var(--bg-surface-alt); padding: 8px 12px; border-radius: var(--radius-sm);">
+                    <strong>Textbook Verification Formulas:</strong>
+                    <code>Turnaround Time (TAT) = CT − AT</code> &bull;
+                    <code>Waiting Time (WT) = TAT − BT</code> &bull;
+                    <code>Response Time (RT) = First CPU Time − AT</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Gantt Chart -->
+        <section class="gantt-container">
+            <h3 style="font-size: 1.05rem; color: var(--primary); margin-bottom: 8px;">Execution Timeline (Gantt Chart):</h3>
+            <div class="gantt-timeline-wrapper">
+                <div id="results-gantt-chart" class="gantt-chart-bar"></div>
+            </div>
+        </section>
+
+        <!-- Section 3: CPU Utilization Bar Chart -->
+        <section class="card">
+            <div class="card-header">
+                <h2>2. CPU Allocation &amp; Utilization Graph</h2>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Total Timeline: <strong id="res-total-time">0</strong> units</span>
+            </div>
+            <div class="card-body">
+                <div class="cpu-bar-chart-card">
+                    <div class="chart-y-axis">
+                        <span>100%</span>
+                        <span>80%</span>
+                        <span>60%</span>
+                        <span>40%</span>
+                        <span>20%</span>
+                        <span>0%</span>
+                    </div>
+                    <div id="results-util-bars" class="chart-bars-area"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Multi-Algorithm Comparison Matrix -->
+        <section class="card">
+            <div class="card-header">
+                <h2>3. Comprehensive Algorithm Comparison Matrix</h2>
+                <span class="badge-tag">Exact Same Workload Comparison</span>
+            </div>
+            <div class="card-body">
+                
+                <!-- Winner Banner -->
+                <div id="results-winner-card" style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px;"></div>
+
+                <div class="table-responsive">
+                    <table class="data-table text-center">
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Type</th>
+                                <th>Avg WT</th>
+                                <th>Avg TAT</th>
+                                <th>Avg RT</th>
+                                <th>Context Switches</th>
+                                <th>CPU Util</th>
+                                <th>Verdict</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-comparison-tbody">
+                            <!-- Populated by js/results.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="site-footer-placeholder"></div>
+
+    <script src="js/engine.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/results.js"></script>
+</body>
+</html>

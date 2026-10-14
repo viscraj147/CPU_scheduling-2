@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Simulation - CPU Scheduling &amp; DS Visualizer</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/simulation.css">
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="site-header-placeholder"></div>
+
+    <main id="main-content" class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-top">
+                <div>
+                    <h1 class="page-title">Real-Time CPU Simulation &amp; Data Structure Monitor</h1>
+                    <p class="page-subtitle">
+                        Observe deterministic process execution, array traversal, ready queue operations, circular rotation, and context switching step-by-step.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="results.html" class="btn btn-secondary btn-sm">View Final Results &rarr;</a>
+                    <a href="ds-lab.html" class="btn btn-secondary btn-sm">Open DS Lab &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Bar -->
+        <div class="sim-status-bar">
+            <div class="sim-status-item">
+                <span class="label">Algorithm:</span>
+                <span id="dash-algo" class="val">FCFS</span>
+            </div>
+            <div class="sim-status-item">
+                <span class="label">Context Switches:</span>
+                <span id="dash-switches" class="val">0</span>
+            </div>
+            <div class="sim-status-item">
+                <span class="label">Simulation State:</span>
+                <span id="dash-status" class="val">Ready</span>
+            </div>
+        </div>
+
+        <!-- Section 1: Process Dataset & Settings -->
+        <section class="card">
+            <div class="card-header">
+                <h2>1. Process Workload Configuration</h2>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" id="btn-add-row" class="btn btn-secondary btn-sm">+ Add Process</button>
+                    <button type="button" id="btn-load-sample" class="btn btn-secondary btn-sm">Load Default Sample</button>
+                    <button type="button" id="btn-reset-data" class="btn btn-secondary btn-sm">Reset</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table text-center" id="process-input-table">
+                        <thead>
+                            <tr>
+                                <th>Process ID</th>
+                                <th>Arrival Time (AT)</th>
+                                <th>Burst Time (BT)</th>
+                                <th>Priority (Lower = Higher)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="process-table-body">
+                            <!-- Populated dynamically by js/simulation.js -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Scheduling Algorithm Selection Tabs -->
+                <div style="margin-top: 14px;">
+                    <label class="form-label">Select Scheduling Algorithm:</label>
+                    <div class="algo-tabs">
+                        <button type="button" class="algo-btn active" data-algo="fcfs">FCFS</button>
+                        <button type="button" class="algo-btn" data-algo="sjf">SJF (Non-Preemptive)</button>
+                        <button type="button" class="algo-btn" data-algo="srtf">SRTF (Preemptive)</button>
+                        <button type="button" class="algo-btn" data-algo="rr">Round Robin</button>
+                        <button type="button" class="algo-btn" data-algo="priority-np">Priority (Non-Preemptive)</button>
+                        <button type="button" class="algo-btn" data-algo="priority-p">Priority (Preemptive)</button>
+                    </div>
+
+                    <!-- Round Robin Time Quantum -->
+                    <div id="quantum-container" class="form-inline" style="display: none; margin-top: 10px;">
+                        <label for="input-quantum" class="form-label" style="margin-bottom: 0;">Time Quantum (q):</label>
+                        <input type="number" id="input-quantum" min="1" max="50" value="2" class="input-mini">
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">(Duration of CPU allocation per rotation)</span>
+                    </div>
+
+                    <!-- Aging & Starvation Detection Settings -->
+                    <div class="form-inline" style="margin-top: 12px; gap: 18px;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="chk-aging" checked>
+                            <span>Enable Aging Mechanism (boost priority by 1 every</span>
+                            <input type="number" id="input-aging-interval" min="1" max="20" value="3" class="input-mini">
+                            <span>units waiting)</span>
+                        </label>
+
+                        <label class="checkbox-label">
+                            <span>Starvation Threshold:</span>
+                            <input type="number" id="input-starvation" min="2" max="50" value="10" class="input-mini">
+                            <span>units</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Simulation Controls Panel -->
+        <section class="sim-controls-panel">
+            <div class="sim-buttons">
+                <button type="button" id="btn-play" class="btn btn-accent">▶ Play</button>
+                <button type="button" id="btn-pause" class="btn btn-secondary" disabled>⏸ Pause</button>
+                <div class="btn-group">
+                    <button type="button" id="btn-prev" class="btn btn-secondary" title="Restore previous step">⏮ Prev Step</button>
+                    <button type="button" id="btn-next" class="btn btn-secondary" title="Advance one step">Next Step ⏭</button>
+                </div>
+                <button type="button" id="btn-reset-sim" class="btn btn-secondary">↺ Reset</button>
+                <button type="button" id="btn-replay" class="btn btn-secondary">⟳ Replay</button>
+            </div>
+
+            <div class="sim-speed-control">
+                <label for="select-speed">Speed:</label>
+                <select id="select-speed" class="select-mini">
+                    <option value="2000">0.5x (Slow - 2s)</option>
+                    <option value="1000" selected>1.0x (Normal - 1s)</option>
+                    <option value="500">2.0x (Fast - 0.5s)</option>
+                    <option value="250">4.0x (Ultra - 0.25s)</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Event Explanation Box -->
+        <div class="event-explanation-box">
+            <div class="event-title">
+                <span>💬 Event Log:</span>
+                <span id="event-title">Simulation Initialized</span>
+            </div>
+            <div id="event-desc" class="event-desc">
+                Click <strong>Play</strong> or <strong>Next Step</strong> to observe CPU execution and data structure updates.
+            </div>
+            <div id="event-trace" class="event-trace">
+                // Ready for simulation execution
+            </div>
+        </div>
+
+        <!-- Simulation Grid: CPU Register + Process Array -->
+        <div class="sim-core-grid">
+            <!-- CPU Core Register Card -->
+            <div class="cpu-core-card">
+                <div>
+                    <div class="cpu-core-header">
+                        <span style="font-weight: 700; font-size: 0.88rem; color: var(--primary);">CPU REGISTER</span>
+                        <span id="cpu-clock" class="cpu-clock-display">T = 0</span>
+                    </div>
+                    <div class="cpu-register-body">
+                        <div id="cpu-executing-pid" class="cpu-executing-pid idle">IDLE</div>
+                        <div id="cpu-executing-meta" class="cpu-executing-meta">Awaiting dispatch</div>
+                    </div>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 8px;">
+                    Simulates CPU instruction cycle and register reload during context switching.
+                </div>
+            </div>
+
+            <!-- Process Array (Indexed Contiguous Memory Model) -->
+            <div class="card" style="margin-bottom: 0;">
+                <div class="card-header">
+                    <h3>1. Process Array Memory Model <code>Process p[N]</code></h3>
+                    <span class="badge-tag">Indexed Contiguous Memory</span>
+                </div>
+                <div class="card-body">
+                    <div id="ds-array-container" class="ds-array-container">
+                        <!-- Populated by js/simulation.js -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: FIFO Ready Queue -->
+        <section class="card">
+            <div class="card-header">
+                <h3>2. FIFO Ready Queue <code>int queue[500]</code></h3>
+                <div style="font-family: var(--font-mono); font-size: 0.82rem; display: flex; gap: 10px;">
+                    <span class="pill pill-primary">FRONT: <strong id="queue-front-val">0</strong></span>
+                    <span class="pill pill-waiting">REAR: <strong id="queue-rear-val">0</strong></span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="queue-visual-track">
+                    <span class="queue-pointer-label">FRONT ──►</span>
+                    <div id="ds-queue-container" class="queue-elements-list">
+                        <!-- Queue items -->
+                    </div>
+                    <span class="queue-pointer-label">◄── REAR</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Circular Queue (Round Robin Only) -->
+        <section class="card" id="circular-queue-section" style="display: none;">
+            <div class="card-header">
+                <h3>3. Circular Ring Buffer (Round Robin Time-Sharing)</h3>
+                <span class="badge-tag">Modulo: (rear + 1) % capacity</span>
+            </div>
+            <div class="card-body">
+                <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 8px;">
+                    When time quantum expires, unfinished jobs are placed at the rear of this circular buffer, reusing array slots without shifting memory.
+                </p>
+                <div id="cq-slots-track" class="cq-slots-track">
+                    <!-- Circular queue slots -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Live Gantt Chart -->
+        <section class="gantt-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="font-size: 1.05rem; color: var(--primary);">Live Execution Timeline (Gantt Chart)</h3>
+                <span style="font-size: 0.82rem; color: var(--text-muted);">Dynamically generated during simulation</span>
+            </div>
+            <div class="gantt-timeline-wrapper">
+                <div id="gantt-chart-bar" class="gantt-chart-bar">
+                    <!-- Dynamic Gantt blocks -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="site-footer-placeholder"></div>
+
+    <script src="js/engine.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/simulation.js"></script>
+</body>
+</html>

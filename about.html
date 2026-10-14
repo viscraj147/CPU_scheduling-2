@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - CPU Scheduling &amp; DS Visualizer</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .about-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 850px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .meta-list {
+            list-style: none;
+            font-size: 0.92rem;
+        }
+        .meta-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+        }
+        .meta-list li:last-child {
+            border-bottom: none;
+        }
+        .meta-list span {
+            color: var(--text-muted);
+        }
+        .meta-list strong {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="site-header-placeholder"></div>
+
+    <main id="main-content" class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">About the Project</h1>
+            <p class="page-subtitle">
+                Academic engineering project exploring the computational foundation of CPU scheduling algorithms and their underlying fundamental Data Structures.
+            </p>
+        </div>
+
+        <div class="about-grid">
+            <div>
+                <!-- Project Objective -->
+                <section class="card">
+                    <div class="card-header">
+                        <h2>🎯 Project Objective &amp; Problem Statement</h2>
+                    </div>
+                    <div class="card-body">
+                        <p style="margin-bottom: 12px; font-size: 0.93rem; color: var(--text-secondary);">
+                            <strong>Problem Statement:</strong> In undergraduate Computer Science curricula, CPU scheduling algorithms are frequently taught as theoretical scheduling formulas without demonstrating the concrete memory structures, array indexing, and queue pointer manipulations required to implement them on real hardware.
+                        </p>
+                        <p style="font-size: 0.93rem; color: var(--text-secondary);">
+                            <strong>Objective:</strong> To develop an interactive, multi-page educational web simulation platform that bridges Operating Systems concepts and Data Structures by demonstrating how Contiguous Arrays, FIFO Queues, Circular Ring Buffers, and Min-Heaps manage processes during scheduling execution in real time.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Key Features -->
+                <section class="card">
+                    <div class="card-header">
+                        <h2>✨ Key Educational Features</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="feature-list">
+                            <li><strong>Deterministic Simulation Engine:</strong> Step-based scheduler producing mathematically precise snapshots with instant backward step rollback.</li>
+                            <li><strong>Dual OS &amp; DS Visualizations:</strong> Real-time process array memory (<code>p[N]</code>), FIFO ready queues, and Round Robin circular ring buffers.</li>
+                            <li><strong>Dynamic Starvation &amp; Aging:</strong> Demonstrates priority promotion algorithms to prevent indefinite postponement.</li>
+                            <li><strong>Interactive Data Structure Lab:</strong> 6 dedicated interactive modules covering Arrays, Queues, Circular Queues, Min-Heaps, BSTs, and LIFO Call Stacks.</li>
+                            <li><strong>Persistent History &amp; Comparison:</strong> Browser-local run storage, replay capabilities, side-by-side run comparisons, and CSV reports.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Learning Outcomes -->
+                <section class="card">
+                    <div class="card-header">
+                        <h2>📚 Learning Outcomes</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="feature-list">
+                            <li>Understand the exact mapping between Process IDs and array indices in memory.</li>
+                            <li>Appreciate how Circular Queues avoid <code>O(N)</code> memory shifts using modulo arithmetic.</li>
+                            <li>Evaluate trade-offs between preemption responsiveness and context switching overhead.</li>
+                            <li>Gain confidence in Data Structures &amp; Operating Systems viva voce examinations.</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sidebar Info & Credits -->
+            <div>
+                <section class="card">
+                    <div class="card-header">
+                        <h3>🛠️ Technology Stack</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="meta-list">
+                            <li><span>Architecture</span> <strong>Multi-Page Web App</strong></li>
+                            <li><span>Markup</span> <strong>Semantic HTML5</strong></li>
+                            <li><span>Styling</span> <strong>Vanilla CSS3 (Custom Design)</strong></li>
+                            <li><span>Logic</span> <strong>Pure ES6+ JavaScript</strong></li>
+                            <li><span>Storage</span> <strong>HTML5 LocalStorage</strong></li>
+                            <li><span>Deployment</span> <strong>GitHub Pages (Zero Config)</strong></li>
+                            <li><span>External Deps</span> <strong>None (100% Vanilla)</strong></li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Student Credits Card -->
+                <section class="card">
+                    <div class="card-header">
+                        <h3>👨‍💻 Student Project Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="meta-list">
+                            <li><span>Project</span> <strong>CPU Scheduling Visualizer</strong></li>
+                            <li><span>Department</span> <strong>Computer Engineering</strong></li>
+                            <li><span>Semester</span> <strong>Data Structures &amp; Algorithms</strong></li>
+                            <li><span>Author / Student</span> <strong>[Student Name Placeholder]</strong></li>
+                            <li><span>Institution</span> <strong>[College Name Placeholder]</strong></li>
+                            <li><span>Guide / Faculty</span> <strong>[Faculty Guide Placeholder]</strong></li>
+                        </ul>
+                        <div style="margin-top: 14px;">
+                            <a href="original/index.html" class="btn btn-secondary btn-sm" style="width: 100%;">Open Original Classic Version</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="site-footer-placeholder"></div>
+
+    <script src="js/engine.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/navbar.js"></script>
+</body>
+</html>

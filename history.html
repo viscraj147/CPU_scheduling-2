@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execution History - CPU Scheduling &amp; DS Visualizer</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/simulation.css">
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="site-header-placeholder"></div>
+
+    <main id="main-content" class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-top">
+                <div>
+                    <h1 class="page-title">Simulation Execution History</h1>
+                    <p class="page-subtitle">
+                        Persistent log of completed scheduling runs saved locally in browser storage. Compare runs, inspect past datasets, and replay simulations.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" id="btn-compare-selected" class="btn btn-primary btn-sm">Compare 2 Selected Runs</button>
+                    <button type="button" id="btn-clear-history" class="btn btn-secondary btn-sm">Clear All History</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side-by-Side Comparison Modal / Box -->
+        <section id="history-comparison-view" class="card" style="display: none; border-color: var(--accent-blue);">
+            <div class="card-header" style="background-color: #eff6ff;">
+                <h2>⚡ Side-by-Side Simulation Comparison</h2>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- Sim 1 -->
+                    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <h3 id="comp-sim1-title" style="font-size: 1rem; color: var(--primary); margin-bottom: 8px;">Simulation 1</h3>
+                        <div class="algo-info-row"><strong>Average Waiting Time:</strong> <span id="comp-sim1-wt">0.00</span></div>
+                        <div class="algo-info-row"><strong>Average Turnaround Time:</strong> <span id="comp-sim1-tat">0.00</span></div>
+                        <div class="algo-info-row"><strong>CPU Utilization:</strong> <span id="comp-sim1-util">100%</span></div>
+                        <div class="algo-info-row"><strong>Context Switches:</strong> <span id="comp-sim1-switches">0</span></div>
+                    </div>
+
+                    <!-- Sim 2 -->
+                    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <h3 id="comp-sim2-title" style="font-size: 1rem; color: var(--primary); margin-bottom: 8px;">Simulation 2</h3>
+                        <div class="algo-info-row"><strong>Average Waiting Time:</strong> <span id="comp-sim2-wt">0.00</span></div>
+                        <div class="algo-info-row"><strong>Average Turnaround Time:</strong> <span id="comp-sim2-tat">0.00</span></div>
+                        <div class="algo-info-row"><strong>CPU Utilization:</strong> <span id="comp-sim2-util">100%</span></div>
+                        <div class="algo-info-row"><strong>Context Switches:</strong> <span id="comp-sim2-switches">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Empty History Alert -->
+        <div id="history-empty-alert" class="alert alert-info" style="display: none;">
+            No simulation history records logged yet. Run a simulation in the <a href="simulation.html" style="font-weight: 700; color: inherit;">Simulation Page</a> to record data automatically.
+        </div>
+
+        <!-- History Records Table -->
+        <section class="card">
+            <div class="card-header">
+                <h2>📋 Saved Simulation Log</h2>
+                <span class="badge-tag">Browser LocalStorage</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table text-center">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Run</th>
+                                <th>Timestamp</th>
+                                <th>Algorithm</th>
+                                <th>Workload</th>
+                                <th>Avg WT</th>
+                                <th>Avg TAT</th>
+                                <th>CPU Util</th>
+                                <th>Switches</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <!-- Populated by js/history.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="site-footer-placeholder"></div>
+
+    <script src="js/engine.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/history.js"></script>
+</body>
+</html>

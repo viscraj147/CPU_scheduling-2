@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Code Explorer &amp; Viva Guide - CPU Scheduling &amp; DS Visualizer</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .code-snippet-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .code-snippet-header {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+        .code-snippet-header span {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .code-meta-box {
+            background-color: var(--bg-surface-alt);
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.92rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .viva-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-bottom: 12px;
+        }
+        .viva-q {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+        .viva-a {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="site-header-placeholder"></div>
+
+    <main id="main-content" class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-top">
+                <div>
+                    <h1 class="page-title">C++ Code &amp; Data Structure Explorer</h1>
+                    <p class="page-subtitle">
+                        Direct connection between web visualizations and native C++ implementations. Learn how structs, pointers, circular buffers, and heaps operate under the hood for engineering vivas.
+                    </p>
+                </div>
+                <div>
+                    <a href="ds-lab.html" class="btn btn-primary btn-sm">🧠 Practice in DS Lab</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. Process Struct Memory Layout -->
+        <section class="code-snippet-card">
+            <div class="code-snippet-header">
+                <strong style="color: #60a5fa;">1. Process Control Block Struct: Process.hpp</strong>
+                <span>Memory Offset: 32 bytes</span>
+            </div>
+            <div class="code-meta-box">
+                <div><strong>Data Structure:</strong> Contiguous C++ Struct</div>
+                <div><strong>Time Complexity:</strong> O(1) attribute access</div>
+                <div><strong>Space Complexity:</strong> O(N * sizeof(Process))</div>
+            </div>
+            <pre><code>// Contiguous struct memory representing each Process in the scheduling table
+struct Process {
+    int id;              // Process ID (PID)
+    int arrival;         // Arrival Time in milliseconds / ticks
+    int burst;           // CPU Burst duration required
+    int remaining;       // Remaining CPU execution time
+    int priority;        // Process priority (lower numeric value = higher priority)
+    int completion;      // Time at which process finishes execution
+    int waiting;         // Total time spent in ready queue (TAT - Burst)
+    int turnaround;      // Total lifespan from arrival to completion (CT - AT)
+    int response_time;   // First time CPU was acquired minus Arrival Time
+};
+
+// Global array allocated on stack or heap:
+Process p[50]; // Bounded contiguous array for processes</code></pre>
+            <div class="card-footer">
+                <strong>Why it matters:</strong> Demonstrates that process tables in operating system kernels (like Linux <code>task_struct</code>) are contiguous memory records indexed by PID or task pointer.
+            </div>
+        </section>
+
+        <!-- 2. Array Traversal for SJF / Priority -->
+        <section class="code-snippet-card">
+            <div class="code-snippet-header">
+                <strong style="color: #60a5fa;">2. Linear Array Traversal for Process Selection</strong>
+                <span>Function: select_next_sjf()</span>
+            </div>
+            <div class="code-meta-box">
+                <div><strong>Data Structure:</strong> Linear Array Search</div>
+                <div><strong>Time Complexity:</strong> O(N) per selection</div>
+                <div><strong>Operation:</strong> Minimum burst comparison scan</div>
+            </div>
+            <pre><code>// Linear scan to find the arrived process with the minimum burst time
+int select_next_sjf(Process p[], int n, int current_time) {
+    int min_burst = 1e9;
+    int selected_idx = -1;
+
+    for (int i = 0; i < n; i++) {
+        // Condition: Process has arrived and still has remaining CPU time
+        if (p[i].arrival &lt;= current_time &amp;&amp; p[i].remaining &gt; 0) {
+            if (p[i].remaining &lt; min_burst) {
+                min_burst = p[i].remaining;
+                selected_idx = i;
+            } else if (p[i].remaining == min_burst) {
+                // Tie-breaking policy: Earliest arrival time, then smallest PID
+                if (selected_idx != -1 &amp;&amp; p[i].arrival &lt; p[selected_idx].arrival) {
+                    selected_idx = i;
+                }
+            }
+        }
+    }
+    return selected_idx; // Returns -1 if CPU is IDLE
+}</code></pre>
+            <div class="card-footer">
+                <strong>Viva Tip:</strong> While <code>O(N)</code> is fast for small process tables (&lt; 100), high-performance schedulers replace linear arrays with <code>O(log N)</code> heaps or red-black trees.
+            </div>
+        </section>
+
+        <!-- 3. Circular Queue for Round Robin -->
+        <section class="code-snippet-card">
+            <div class="code-snippet-header">
+                <strong style="color: #60a5fa;">3. Circular Queue (Ring Buffer) for Round Robin</strong>
+                <span>Class: CircularQueue</span>
+            </div>
+            <div class="code-meta-box">
+                <div><strong>Data Structure:</strong> Modulo Ring Buffer</div>
+                <div><strong>Time Complexity:</strong> O(1) Enqueue, O(1) Dequeue</div>
+                <div><strong>Key Equation:</strong> (rear + 1) % CAPACITY</div>
+            </div>
+            <pre><code>class CircularQueue {
+private:
+    static const int CAPACITY = 100;
+    int data[CAPACITY];
+    int front;
+    int rear;
+    int count;
+
+public:
+    CircularQueue() : front(0), rear(0), count(0) {}
+
+    bool is_full() const { return count == CAPACITY; }
+    bool is_empty() const { return count == 0; }
+
+    // Enqueue process ID to rear
+    void enqueue(int pid) {
+        if (is_full()) return;
+        data[rear] = pid;
+        rear = (rear + 1) % CAPACITY; // Wraparound behavior
+        count++;
+    }
+
+    // Dequeue process ID from front
+    int dequeue() {
+        if (is_empty()) return -1;
+        int pid = data[front];
+        front = (front + 1) % CAPACITY; // Wraparound behavior
+        count--;
+        return pid;
+    }
+};</code></pre>
+            <div class="card-footer">
+                <strong>Why Modulo:</strong> Eliminates memory fragmentation and prevents shifting elements when front items depart.
+            </div>
+        </section>
+
+        <!-- 4. Viva Voce Common Q&A -->
+        <section class="card">
+            <div class="card-header">
+                <h2>🎓 Data Structures &amp; OS Viva Voce Preparation Guide</h2>
+                <span class="badge-tag">Exam &amp; Viva Q&amp;A</span>
+            </div>
+            <div class="card-body">
+                
+                <div class="viva-card">
+                    <div class="viva-q">Q1: Why is a Circular Queue preferred over a standard linear array for Round Robin?</div>
+                    <div class="viva-a">
+                        In a standard linear queue, every dequeue operation leaves unused slots at the front. To reuse them, you must shift all remaining elements, taking <code>O(N)</code> time. A Circular Queue uses modulo arithmetic to wrap pointers in <code>O(1)</code> time, completely avoiding costly array shifts.
+                    </div>
+                </div>
+
+                <div class="viva-card">
+                    <div class="viva-q">Q2: How does Shortest Remaining Time First (SRTF) utilize a Min-Heap?</div>
+                    <div class="viva-a">
+                        SRTF requires frequent selection of the process with the minimum remaining burst time. In an array, this requires an <code>O(N)</code> scan every second. By organizing the ready set as a Min-Heap keyed on <code>remaining_time</code>, the next process can be accessed in <code>O(1)</code> and updated in <code>O(log N)</code>.
+                    </div>
+                </div>
+
+                <div class="viva-card">
+                    <div class="viva-q">Q3: What is the convoy effect, and which data structure problem causes it?</div>
+                    <div class="viva-a">
+                        The convoy effect occurs in FCFS when a long CPU-bound process blocks multiple short I/O-bound processes behind it in a single FIFO queue, causing high average waiting time. Multi-level feedback queues (MLFQ) solve this by maintaining separate priority queues.
+                    </div>
+                </div>
+
+                <div class="viva-card">
+                    <div class="viva-q">Q4: What data structure preserves state during CPU context switches?</div>
+                    <div class="viva-a">
+                        The <strong>Call Stack / Kernel Interrupt Stack</strong>. When a timer interrupt occurs, the hardware pushes program counters, CPU flags, and register states onto the stack in LIFO order, and pops them when restoring execution.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div id="site-footer-placeholder"></div>
+
+    <script src="js/engine.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/navbar.js"></script>
+</body>
+</html>

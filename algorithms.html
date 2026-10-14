@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithms Reference - CPU Scheduling &amp; DS Visualizer</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/simulation.css">
+    <style>
+        .algo-nav-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .algo-nav-btn {
+            padding: 9px 16px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .algo-nav-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .algo-nav-btn.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .algo-detail-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 850px) {
+            .algo-detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .algo-info-row {
+            margin-bottom: 12px;
+            font-size: 0.92rem;
+        }
+        .algo-info-row strong {
+            display: block;
+            color: var(--primary);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="site-header-placeholder"></div>
+
+    <main id="main-content" class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-top">
+                <div>
+                    <h1 class="page-title">CPU Scheduling Algorithms Reference</h1>
+                    <p class="page-subtitle">
+                        Comprehensive analysis, data structure mechanisms, time complexity, step-by-step example execution, and trade-offs for all 6 supported scheduling models.
+                    </p>
+                </div>
+                <div>
+                    <button type="button" id="btn-try-algo" class="btn btn-accent btn-sm">▶ Try this algorithm in Simulation</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Algorithm Navigation Tabs -->
+        <nav class="algo-nav-tabs" aria-label="Algorithms Tabs">
+            <button type="button" class="algo-nav-btn active" data-algo="fcfs">1. FCFS</button>
+            <button type="button" class="algo-nav-btn" data-algo="sjf">2. SJF (Non-Preemptive)</button>
+            <button type="button" class="algo-nav-btn" data-algo="srtf">3. SRTF (Preemptive)</button>
+            <button type="button" class="algo-nav-btn" data-algo="rr">4. Round Robin</button>
+            <button type="button" class="algo-nav-btn" data-algo="priority-np">5. Priority (Non-Preemptive)</button>
+            <button type="button" class="algo-nav-btn" data-algo="priority-p">6. Priority (Preemptive)</button>
+        </nav>
+
+        <!-- Main Detail Card -->
+        <section class="card">
+            <div class="card-header">
+                <h2 id="algo-name-title">First Come First Serve (FCFS)</h2>
+                <span id="algo-type-pill" class="pill pill-idle">Non-Preemptive</span>
+            </div>
+            <div class="card-body">
+                
+                <div class="algo-detail-grid">
+                    <div>
+                        <div class="algo-info-row">
+                            <strong>Underlying Data Structure:</strong>
+                            <span id="algo-ds-text" style="font-family: var(--font-mono); color: var(--accent-blue);">Linear FIFO Ready Queue (queue[front], queue[rear])</span>
+                        </div>
+                        <div class="algo-info-row">
+                            <strong>Process Selection Mechanism:</strong>
+                            <span id="algo-selection-text">Selects the process with the earliest arrival time.</span>
+                        </div>
+                        <div class="algo-info-row">
+                            <strong>Implementation Complexity:</strong>
+                            <span id="algo-complexity-text" style="font-family: var(--font-mono);">Time: O(N) selection or O(1) with FIFO queue | Space: O(N)</span>
+                        </div>
+                    </div>
+
+                    <!-- Metric Highlights for Sample Run -->
+                    <div style="background-color: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Standard Sample Performance:</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; font-size: 0.88rem;">
+                            <div>Avg Waiting: <strong id="stat-avg-wt">0.00</strong></div>
+                            <div>Avg Turnaround: <strong id="stat-avg-tat">0.00</strong></div>
+                            <div>Avg Response: <strong id="stat-avg-rt">0.00</strong></div>
+                            <div>Context Switches: <strong id="stat-switches">0</strong></div>
+                            <div style="grid-column: span 2;">CPU Utilization: <strong id="stat-util">100%</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advantages & Limitations -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;">
+                    <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: var(--radius-sm); padding: 12px 16px;">
+                        <strong style="color: #166534; font-size: 0.9rem; display: block; margin-bottom: 6px;">✓ Advantages:</strong>
+                        <ul id="algo-adv-list" style="margin-left: 18px; font-size: 0.88rem; color: #166534;"></ul>
+                    </div>
+
+                    <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: var(--radius-sm); padding: 12px 16px;">
+                        <strong style="color: #991b1b; font-size: 0.9rem; display: block; margin-bottom: 6px;">✗ Limitations:</strong>
+                        <ul id="algo-lim-list" style="margin-left: 18px; font-size: 0.88rem; color: #991b1b;"></ul>
+                    </div>
+                </div>
+
+                <!-- Example Gantt Chart -->
+                <div style="margin-top: 20px;">
+                    <h3 style="font-size: 1rem; color: var(--primary); margin-bottom: 8px;">Execution Timeline (Gantt Chart for Sample Workload):</h3>
+                    <div class="gantt-timeline-wrapper">
+                        <div id="algo-gantt-chart" class="gantt-chart-bar"></div>
+                    </div>
+                </div>
+
+                <!-- Process Results Table for Sample Workload -->
+                <div style="margin-top: 20px;">
+                    <h3 style="font-size: 1rem; color: var(--primary); margin-bottom: 8px;">Sample Workload Process Table:</h3>
+                    <div class="table-responsive">
+                        <table class="data-table text-center">
+                            <thead>
+                                <tr>
+                                    <th>Process ID</th>
+                                    <th>Arrival Time (AT)</th>
+                                    <th>Burst Time (BT)</th>
+                                    <th>Priority</th>
+                                    <th>Completion Time (CT)</th>
+                                    <th>Turnaround Time (TAT)</th>
+                                    <th>Waiting Time (WT)</th>
+                                    <th>Response Time (RT)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="algo-sample-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div id="site-footer-placeholder"></div>
+
+    <script src="js/engine.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/algorithms.js"></script>
+</body>
+</html>

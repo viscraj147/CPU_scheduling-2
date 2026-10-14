@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Structure Lab - CPU Scheduling &amp; DS Visualizer</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/simulation.css">
+    <link rel="stylesheet" href="css/ds-lab.css">
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="site-header-placeholder"></div>
+
+    <main id="main-content" class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-top">
+                <div>
+                    <h1 class="page-title">Data Structure Laboratory</h1>
+                    <p class="page-subtitle">
+                        Interactive experimentation with the fundamental data structures powering CPU scheduling: Arrays, FIFO Queues, Circular Buffers, Min-Heaps, Binary Search Trees, and Call Stacks.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="simulation.html" class="btn btn-accent btn-sm">▶ Open Live Scheduler</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation for the 6 Modules -->
+        <nav class="ds-tabs-nav" aria-label="Data Structure Modules">
+            <button type="button" class="ds-tab-btn active" data-target="module-array">Module A: Process Array</button>
+            <button type="button" class="ds-tab-btn" data-target="module-queue">Module B: FIFO Ready Queue</button>
+            <button type="button" class="ds-tab-btn" data-target="module-cq">Module C: Circular Queue</button>
+            <button type="button" class="ds-tab-btn" data-target="module-heap">Module D: Min-Heap / Priority Queue</button>
+            <button type="button" class="ds-tab-btn" data-target="module-bst">Module E: Binary Search Tree</button>
+            <button type="button" class="ds-tab-btn" data-target="module-stack">Module F: Call Stack / State Rollback</button>
+        </nav>
+
+        <!-- ==========================================================
+             MODULE A: PROCESS ARRAY VISUALIZER
+             ========================================================== -->
+        <section id="module-array" class="ds-module-pane active">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Module A: Indexed Process Array Model <code>Process p[N]</code></h2>
+                    <span class="badge-tag">Linear Memory Traversal</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 14px;">
+                        In standard C++ implementations, processes are stored as an array of structs: <code>struct Process p[50];</code>. When a non-preemptive algorithm selects the next task, it traverses the array linearly to find the optimal process. Observe how comparison counts scale with array size.
+                    </p>
+
+                    <!-- Module Toolbar -->
+                    <div class="module-toolbar">
+                        <strong>Linear Scan Actions:</strong>
+                        <button type="button" id="btn-array-min-bt" class="btn btn-secondary btn-sm">Find Min Burst Time (SJF)</button>
+                        <button type="button" id="btn-array-highest-pr" class="btn btn-secondary btn-sm">Find Highest Priority</button>
+                        <button type="button" id="btn-array-earliest-at" class="btn btn-secondary btn-sm">Find Earliest Arrival (FCFS)</button>
+                        <button type="button" id="btn-array-reset" class="btn btn-secondary btn-sm">↺ Reset</button>
+                        <div style="margin-left: auto; font-family: var(--font-mono); font-size: 0.88rem;">
+                            Comparisons: <strong id="array-comp-count">0</strong>
+                        </div>
+                    </div>
+
+                    <!-- Array Stage -->
+                    <div class="stage-card">
+                        <div id="array-slots-stage" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                            <!-- Populated by js/ds-lab.js -->
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" id="array-log-msg">
+                        Click any action above to execute linear search comparison across array elements.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             MODULE B: LINEAR FIFO QUEUE
+             ========================================================== -->
+        <section id="module-queue" class="ds-module-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Module B: Linear FIFO Ready Queue</h2>
+                    <span class="badge-tag">First-In First-Out Order</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 14px;">
+                        Demonstrates the classic bounded queue (capacity = 6). New arrivals are inserted at the <strong>REAR</strong>; the CPU dispatches from the <strong>FRONT</strong>. Observe the pointer updates upon each operation.
+                    </p>
+
+                    <div class="module-toolbar">
+                        <input type="text" id="input-q-val" placeholder="Process ID (e.g. P5)" style="max-width: 160px;">
+                        <button type="button" id="btn-q-enqueue" class="btn btn-primary btn-sm">Enqueue (Insert Rear)</button>
+                        <button type="button" id="btn-q-dequeue" class="btn btn-secondary btn-sm">Dequeue (Remove Front)</button>
+                        <button type="button" id="btn-q-peek" class="btn btn-secondary btn-sm">Peek Front</button>
+                        <button type="button" id="btn-q-clear" class="btn btn-secondary btn-sm">Clear Queue</button>
+                        <div style="margin-left: auto; font-family: var(--font-mono); font-size: 0.85rem; display: flex; gap: 8px;">
+                            <span class="pill pill-primary">FRONT: <strong id="q-front-idx">0</strong></span>
+                            <span class="pill pill-waiting">REAR: <strong id="q-rear-idx">1</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="stage-card">
+                        <div id="queue-slots-stage" class="slots-container">
+                            <!-- Populated by js/ds-lab.js -->
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" id="queue-log-msg">
+                        Queue initialized with sample processes. Try Enqueue or Dequeue to test FIFO behavior.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             MODULE C: CIRCULAR QUEUE (ROUND ROBIN)
+             ========================================================== -->
+        <section id="module-cq" class="ds-module-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Module C: Circular Queue (Ring Buffer)</h2>
+                    <span class="badge-tag">Modulo: (rear + 1) % size</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 14px;">
+                        In standard linear queues, dequeuing elements leaves unutilized memory at the front. The <strong>Circular Queue</strong> solves this by wrapping the rear pointer back to 0 using modulo arithmetic: <code>rear = (rear + 1) % capacity</code>. This is the exact data structure used by Round Robin time-sharing schedulers.
+                    </p>
+
+                    <div class="module-toolbar">
+                        <input type="text" id="input-cq-val" placeholder="e.g. P3" style="max-width: 140px;">
+                        <button type="button" id="btn-cq-enqueue" class="btn btn-primary btn-sm">Enqueue (Time Slice Requeue)</button>
+                        <button type="button" id="btn-cq-dequeue" class="btn btn-secondary btn-sm">Dequeue (CPU Dispatch)</button>
+                        <button type="button" id="btn-cq-reset" class="btn btn-secondary btn-sm">Reset</button>
+                        <div style="margin-left: auto; font-family: var(--font-mono); font-size: 0.85rem; display: flex; gap: 8px;">
+                            <span class="pill pill-primary">FRONT: <strong id="cq-front-val">0</strong></span>
+                            <span class="pill pill-waiting">REAR: <strong id="cq-rear-val">2</strong></span>
+                            <span class="pill pill-idle">COUNT: <strong id="cq-count-val">2</strong>/6</span>
+                        </div>
+                    </div>
+
+                    <div class="stage-card">
+                        <div id="cq-interactive-stage" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                            <!-- Populated by js/ds-lab.js -->
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" id="cq-log-msg">
+                        Circular buffer ready. Enqueue items to observe wraparound when rear reaches index 5!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             MODULE D: MIN-HEAP / PRIORITY QUEUE
+             ========================================================== -->
+        <section id="module-heap" class="ds-module-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Module D: Binary Min-Heap (SRTF &amp; Priority Queue)</h2>
+                    <span class="badge-tag">O(log N) Priority Access</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 14px;">
+                        Min-Heaps guarantee that the minimum remaining burst time (in SRTF) or highest priority job (in Priority Scheduling) sits at the root (index 0). Insertion runs in <code>O(log N)</code> via bubble-up, and Extract-Min runs in <code>O(log N)</code> via heapify-down.
+                    </p>
+
+                    <div class="module-toolbar">
+                        <input type="number" id="input-heap-val" placeholder="Burst/Priority Key" style="max-width: 160px;" min="1" value="3">
+                        <button type="button" id="btn-heap-insert" class="btn btn-primary btn-sm">Insert Key (Bubble-Up)</button>
+                        <button type="button" id="btn-heap-extract" class="btn btn-secondary btn-sm">Extract-Min (CPU Load)</button>
+                        <button type="button" id="btn-heap-reset" class="btn btn-secondary btn-sm">Reset Heap</button>
+                    </div>
+
+                    <!-- Dual Representation: Tree + Array -->
+                    <div class="stage-card">
+                        <div class="tree-canvas-wrapper" id="heap-tree-stage">
+                            <!-- Hierarchical tree nodes -->
+                        </div>
+                        <div style="margin-top: 18px; width: 100%; border-top: 1px solid var(--border-light); padding-top: 12px; text-align: center;">
+                            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Underlying Array Memory:</span>
+                            <div id="heap-array-view" style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 6px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" id="heap-log-msg">
+                        Min-Heap initialized. Test inserting a smaller key to see it bubble up to the root!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             MODULE E: BINARY SEARCH TREE (BST)
+             ========================================================== -->
+        <section id="module-bst" class="ds-module-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Module E: Binary Search Tree (BST Traversal Explorer)</h2>
+                    <span class="badge-tag">Educational Extension</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 14px;">
+                        <em>Educational Demonstration:</em> Demonstrates ordered storage and traversal algorithms. Notice how <strong>Inorder Traversal</strong> produces a monotonically sorted sequence of process keys—the core mechanism utilized in order-statistic process scheduling.
+                    </p>
+
+                    <div class="module-toolbar">
+                        <input type="number" id="input-bst-val" placeholder="Node Key" style="max-width: 140px;" value="14">
+                        <button type="button" id="btn-bst-insert" class="btn btn-primary btn-sm">Insert Node</button>
+                        <button type="button" id="btn-bst-inorder" class="btn btn-secondary btn-sm">Inorder (L-Root-R)</button>
+                        <button type="button" id="btn-bst-preorder" class="btn btn-secondary btn-sm">Preorder (Root-L-R)</button>
+                        <button type="button" id="btn-bst-postorder" class="btn btn-secondary btn-sm">Postorder (L-R-Root)</button>
+                    </div>
+
+                    <div class="stage-card">
+                        <div id="bst-tree-stage" class="tree-canvas-wrapper">
+                            <!-- BST Visualizer -->
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" id="bst-log-msg">
+                        BST populated with sample keys. Click Inorder to inspect sorted ordering!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             MODULE F: EXECUTION CALL STACK (LIFO)
+             ========================================================== -->
+        <section id="module-stack" class="ds-module-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Module F: Execution Call Stack &amp; State Rollback (LIFO)</h2>
+                    <span class="badge-tag">Last-In First-Out</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 14px;">
+                        Demonstrates authentic LIFO stack mechanics. In operating systems and our simulation engine, the <strong>Call Stack / State Stack</strong> stores CPU register snapshots and program counters during context switches and step rollbacks (Previous Step).
+                    </p>
+
+                    <div class="module-toolbar">
+                        <input type="text" id="input-stack-val" placeholder="Context Snapshot Frame" style="max-width: 200px;">
+                        <button type="button" id="btn-stack-push" class="btn btn-primary btn-sm">Push State Frame</button>
+                        <button type="button" id="btn-stack-pop" class="btn btn-secondary btn-sm">Pop State Frame (Rollback)</button>
+                        <button type="button" id="btn-stack-clear" class="btn btn-secondary btn-sm">Clear Stack</button>
+                        <div style="margin-left: auto; font-family: var(--font-mono); font-size: 0.85rem;">
+                            TOP OF STACK: <strong id="stack-top-val">[Empty]</strong>
+                        </div>
+                    </div>
+
+                    <div class="stage-card">
+                        <div class="stack-visual-wrapper">
+                            <div>
+                                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">LIFO Stack Column</span>
+                                <div id="stack-column-stage" class="stack-column">
+                                    <!-- Populated by js/ds-lab.js -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" id="stack-log-msg">
+                        Stack ready. Push state frames to simulate program counter preservation!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="site-footer-placeholder"></div>
+
+    <script src="js/engine.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/ds-lab.js"></script>
+</body>
+</html>
